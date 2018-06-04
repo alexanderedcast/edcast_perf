@@ -7,13 +7,13 @@ import scala.concurrent.duration._
 
 class EdcastDemoSimulation extends Simulation {
 
-  val env = "demo"
-  val numberOfUsers = 100
-  val UsersDuration = numberOfUsers * 2 seconds
+  val env = System.getProperty("env", "")
 
   val envProperties = EnvSettings.loadEnv(env)
-  val users = envProperties.get("pathToUsers").get
-  val url = envProperties.get("url").get
+  val users = "src/test/resources/" + env + "/user.csv"
+  val url = "https://" + envProperties.get("host").get
+  val numberOfUsers: Int = envProperties.get("numberOfUsers").get.toInt
+  val usersDuration = numberOfUsers * 2 seconds
 
   val httpProtocol = http
     .baseURL(url)
@@ -150,5 +150,5 @@ class EdcastDemoSimulation extends Simulation {
     )
 
 
-  setUp(scn.inject(rampUsers(numberOfUsers) over (200 seconds))).protocols(httpProtocol)
+  setUp(scn.inject(rampUsers(numberOfUsers) over (usersDuration))).protocols(httpProtocol)
 }
